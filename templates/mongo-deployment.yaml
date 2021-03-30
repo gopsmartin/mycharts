@@ -1,24 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongodb-deployment
+  name: {{ .Values.mongo.mongoLabel }}
   labels:
-    app: mongodb
+    app: {{ .Values.mongo.mongoLabel }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.mongo.replicaCount }}
   selector:
     matchLabels:
-      app: mongodb
+      app: {{ .Values.mongo.mongoLabel }}
   template:
     metadata:
       labels:
-        app: mongodb
+        app: {{ .Values.mongo.mongoLabel }}
     spec:
       containers:
-      - name: mongodb
-        image: mongo
+      - name: {{ .Values.mongo.mongoLabel }}
+        image: {{ .Values.mongo.imageName }}
+        imagePullPolicy: {{ .Values.mongo.pullPolicy }}
         ports:
-        - containerPort: 27017
+        - containerPort: {{ .Values.mongo.containerPort }}
         env:
         - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
@@ -30,15 +31,3 @@ spec:
             secretKeyRef:
               name: mongodb-secret
               key: mongo-root-password
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongodb-service
-spec:
-  selector:
-    app: mongodb
-  ports:
-    - protocol: TCP
-      port: 27017
-      targetPort: 27017

@@ -1,24 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-express
+  name: {{ .Values.express.mongoExpress }}
   labels:
-    app: mongo-express
+    app: {{ .Values.express.mongoExpress }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.express.replicaCount }}
   selector:
     matchLabels:
-      app: mongo-express
+      app: {{ .Values.express.mongoExpress }}
   template:
     metadata:
       labels:
-        app: mongo-express
+        app: {{ .Values.express.mongoExpress }}
     spec:
       containers:
-      - name: mongo-express
-        image: mongo-express
+      - name: {{ .Values.express.mongoExpress }}
+        image: {{ .Values.express.imageName }}
+        imagePullPolicy: {{ .Values.express.pullPolicy }}
         ports:
-        - containerPort: 8081
+        - containerPort: {{ .Values.express.containerPort }}
         env:
         - name: ME_CONFIG_MONGODB_ADMINUSERNAME
           valueFrom:
@@ -35,17 +36,3 @@ spec:
             configMapKeyRef:
               name: mongodb-configmap
               key: database_url
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongo-express-service
-spec:
-  selector:
-    app: mongo-express
-  type: LoadBalancer  
-  ports:
-    - protocol: TCP
-      port: 8081
-      targetPort: 8081
-      nodePort: 30000
